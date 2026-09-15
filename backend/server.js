@@ -17,6 +17,20 @@ app.get('/api/projects', (req, res) => {
     res.json(projects);
 });
 
+app.get('/api/projects/:id', (req, res) => {
+    const project = db.prepare(`
+        SELECT * FROM projects WHERE id = ?
+    `).get(req.params.id);
+
+    if (!project) {
+        return res.status(404).json({
+            error: 'Project not found'
+        });
+    }
+
+    res.json(project);
+});
+
 app.post('/api/projects', (req, res) => {
     const { name, description } = req.body;
 
