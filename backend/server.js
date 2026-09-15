@@ -8,6 +8,12 @@ app.get('/', (req, res) => {
     res.send('BACKEND working');
 });
 
+app.get('/api/projects', (req, res) => {
+    const projects = db.prepare('SELECT * FROM projects').all();
+
+    res.json(projects);
+});
+
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
