@@ -1,11 +1,13 @@
 const db = require('./database/database');
 const express = require('express');
 
+const port = 3000;
+
 const app = express();
 
 app.use(express.json());
 
-const port = 3000;
+
 
 app.get('/', (req, res) => {
     res.send('BACKEND working');
@@ -81,6 +83,25 @@ app.put('/api/projects/:id', (req, res) => {
     `).get(projectId);
 
     res.json(project);
+});
+
+app.delete('/api/projects/:id', (req, res) => {
+
+    const projectId = req.params.id;
+
+
+    const result = db.prepare(`
+        DELETE FROM projects
+        WHERE id = ?
+    `).run(projectId);
+
+    if (result.changes === 0) {
+        return res.status(404).json({
+            error: 'Project not found'
+        });
+    }
+
+    res.status(204).send();
 });
 
 app.listen(port, () => {
