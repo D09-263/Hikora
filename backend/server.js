@@ -54,6 +54,36 @@ app.post('/api/projects', (req, res) => {
     res.status(201).json(project);
 });
 
+app.put('/api/projects/:id', (req, res) => {
+    const { name, description } = req.body;
+    const projectId = req.params.id;
+
+    if (!name) {
+        return res.status(400).json({
+            error: 'Project name is required'
+        });
+    }
+
+    const result = db.prepare(`
+        UPDATE projects
+        SET name = ?, description = ?
+        WHERE id = ?
+    `).run(name, description || null, projectId);
+
+    if (result.changes === 0) {
+        return res.status(404).json({
+            error: 'Project not found'
+        });
+    }
+
+    const project = db.prepare(`
+        SELECT * FROM projects WHERE id = ?
+    `).get(projectId);
+
+    res.json(project);
+});
+
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
+
