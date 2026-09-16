@@ -1,12 +1,13 @@
+import { Routes, Route } from 'react-router-dom';
+import ProjectsPage from './pages/ProjectsPage';
+import ProjectDetailsPage from './pages/ProjectDetailsPage';
+
 function App() {
     return (
-        <div>
-            <h1>Project Manager</h1>
-
-            <h2>Hikora Mobile App</h2>
-
-            <p>Mobile application for managing tasks</p>
-        </div>
+        <Routes>
+            <Route path="/" element={<ProjectsPage />} />
+            <Route path="/projects/:id" element={<ProjectDetailsPage />} />
+        </Routes>
     );
 }
 
