@@ -109,3 +109,16 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+.task-card {
+  padding: 16px;
+  border: 3px dashed #090149;
+  box-sizing: border-box;
+  flex: 1 1 300px;
+}
+
+.tasks-container{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}

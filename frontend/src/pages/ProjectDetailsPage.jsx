@@ -30,21 +30,19 @@ function ProjectDetailsPage() {
                 </div>
             )}
             <h2>Tasks</h2>
-
+        
+        <div className="tasks-container">
             {tasks.map(task => (
-                <div key={task.id}>
+                <div className="task-card" key={task.id}>
                     <h3>{task.title}</h3>
-                    <p>ID: {task.id}</p>
-                    <p>Project ID: {task.projectId}</p>
-                    <p>Description: {task.description}</p>
-                    <p>Status: {task.status}</p>
-                    <p>Priority: {task.priority}</p>
-                    <p>Due Date: {task.dueDate}</p>
-                    <p>Created At: {task.createdAd}</p>    
+                    <p>{task.description}</p>
+                    <p>Status: <span>{task.status}</span> | Priority: <span>{task.priority}</span></p>
+                    <p>Due date: {task.dueDate || '—'}</p>
                 </div>
             ))}
         </div>
-    );}
+    </div>
+);}
 
 
 export default ProjectDetailsPage;
