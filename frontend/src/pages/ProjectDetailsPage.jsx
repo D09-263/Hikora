@@ -21,15 +21,16 @@ function ProjectDetailsPage() {
 
     return (
         <div>
-            <h1>Project Details Page</h1>
+            {project && <h1>{project.name}</h1>}
 
             {project && (
                 <div className="project-info">
-                    <h2>{project.name}</h2>
                     <p>{project.description}</p>
                 </div>
             )}
-            <h2>Tasks</h2>
+
+        <div className="tasks-section">
+            <h2 className="tasks-title">Tasks</h2>
         
         <div className="tasks-container">
            {tasks.map(task => (
@@ -53,7 +54,8 @@ function ProjectDetailsPage() {
                             <span>{task.dueDate || '-'}</span>
                         </div>
                 </div>
-            ))}
+              ))}
+            </div>
         </div>
     </div>
 );}

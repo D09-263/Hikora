@@ -117,6 +117,14 @@ padding: 20px;
 box-sizing:border-box;
 }
 
+.tasks-section{
+  margin-top: 24px;
+}
+
+.task-title{
+  margin-bottom: 16px;
+}
+
 .task-card {
   padding: 16px;
   border: 3px dashed #090149;
