@@ -5,6 +5,30 @@ function ProjectDetailsPage() {
     const { id } = useParams();
     const [project, setProject] = useState(null);
     const [tasks, setTasks] = useState([]);
+    const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
+    const [taskTitle, setTaskTitle] = useState('');
+    const [taskDescription, setTaskDescription] = useState('');
+    const [taskPriority, setTaskPriority] = useState('Low');
+    const [taskStatus, setTaskStatus] = useState('Todo');
+    const [taskDueDate, setTaskDueDate] = useState('');
+    const manualCreateTask = () => {
+        const newTask = {
+        title: taskTitle,
+        description: taskDescription,
+        priority: taskPriority,
+        status: taskStatus,
+        dueDate: taskDueDate
+        }
+        console.log(newTask);
+
+        fetch(`http://localhost:3000/api/projects/${id}/tasks`, {
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newTask)
+        });
+    };
 
     useEffect(() => {
         fetch(`http://localhost:3000/api/projects/${id}`)
@@ -31,7 +55,67 @@ function ProjectDetailsPage() {
 
         <div className="tasks-section">
             <h2 className="tasks-title">Tasks</h2>
-        
+            <button className="add-task-button" onClick={() => setIsTaskFormOpen(true)}>
+                Add task     
+            </button>
+
+            {isTaskFormOpen && (
+                <div className="task-form-modal">
+                    <h3>Add task</h3>
+
+                    <label>
+                        Task title
+                        <input type="text" placeholder="Enter task title"
+                        value={taskTitle}
+                        onChange={(event)=> setTaskTitle(event.target.value)}/>
+                    </label>
+
+                    <label>
+                        Description
+                        <textarea placeholder="Enter task description"
+                         value={taskDescription}
+                        onChange={(event)=> setTaskDescription(event.target.value)}/>
+                    </label>
+
+                    <label>
+                        Priority
+                        <select value={taskPriority}
+                        onChange={(event)=> setTaskPriority(event.target.value)}>
+
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Hard">Hard</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Status
+                        <select value={taskStatus}
+                        onChange={(event)=> setTaskStatus(event.target.value)}>
+
+                            <option value="Todo">Todo</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Done">Done</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Due Date
+                        <input type="date"
+                        value={taskDueDate}
+                        onChange={(event)=> setTaskDueDate(event.target.value)}/>
+                    </label>
+
+                    <button onClick={manualCreateTask}>      
+                        Create task
+                    </button>
+
+                    <button onClick={() => setIsTaskFormOpen(false)}>
+                        Cancel 
+                    </button>
+                </div>
+            )}
+
         <div className="tasks-container">
            {tasks.map(task => (
                 <div className="task-card" key={task.id}>

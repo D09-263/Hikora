@@ -111,7 +111,7 @@ code {
 }
 
 .project-info{
-border: 3px solid #0f0913;
+border: 1px solid #0f0913;
 margin-bottom: 24px;
 padding: 20px;
 box-sizing:border-box;
@@ -125,12 +125,50 @@ box-sizing:border-box;
   margin-bottom: 16px;
 }
 
+.task-form-modal{
+  width: 400px;
+  margin: 24px auto;
+  padding: 24px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.task-form-modal label{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.task-form-modal input,
+.task-form-modal textarea{
+  width: 100%;
+  padding: 5px;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+}
+
+.task-form-modal textarea{
+  min-height: 50px;
+  max-width: 100%;
+  resize: vertical;
+}
+
 .task-card {
   padding: 16px;
   border: 3px dashed #090149;
   box-sizing: border-box;
   flex: 1 1 300px;
   transition: transform 0.2s ease;
+}
+
+.task-card:hover{
+  transform: translateY(-7px);
+  border: solid #090149;
 }
 
 .task-meta {
@@ -154,14 +192,10 @@ box-sizing:border-box;
   opacity: 0.6;
 }
 
-.task-card:hover{
-  transform: translateY(-7px);
-  border: solid #090149;
-}
 
 .tasks-container{
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 16px;
 }
 
@@ -219,3 +253,4 @@ box-sizing:border-box;
   gap: 6px;
   margin-top: 16px;
 }
+
