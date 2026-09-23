@@ -1,10 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 function ProjectDetailsPage() {
     const { id } = useParams();
     const [project, setProject] = useState(null);
     const [tasks, setTasks] = useState([]);
+
+    const descriptionRefs = useRef({});
+    const [overflowingTasks, setOverflowingTasks] = useState({});
+    const [selectedTask, setSelectedTask] = useState(null);
+    console.log('SELECTED TASK:', selectedTask);
+
     const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
     const [taskTitle, setTaskTitle] = useState('');
     const [taskDescription, setTaskDescription] = useState('');
@@ -12,6 +18,11 @@ function ProjectDetailsPage() {
     const [taskStatus, setTaskStatus] = useState('Todo');
     const [taskDueDate, setTaskDueDate] = useState('');
     const manualCreateTask = () => {
+        if (!taskTitle.trim()) {
+            alert('Task title is required');
+                return;
+        }
+
         const newTask = {
         title: taskTitle,
         description: taskDescription,
@@ -27,7 +38,26 @@ function ProjectDetailsPage() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(newTask)
-        });
+        })
+            .then(response => {
+                console.log('STATUS:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('DATA:', data);
+                setTasks(prevTasks => [...prevTasks, data]);
+
+                setIsTaskFormOpen(false);
+
+                setTaskTitle('');
+                setTaskDescription('');
+                setTaskPriority('Medium');
+                setTaskStatus('Todo');
+                setTaskDueDate('');
+            })
+            .catch(error => {
+                console.error('ERROR:', error);
+            });
     };
 
     useEffect(() => {
@@ -42,6 +72,20 @@ function ProjectDetailsPage() {
                 setTasks(data);
             });
     }, [id]);
+
+    useEffect(() => {
+        const result = {};
+
+        tasks.forEach(task => {
+            const element = descriptionRefs.current[task.id];
+
+            if (element) {
+                result[task.id] = element.scrollHeight > element.clientHeight;
+            } 
+        });
+
+        setOverflowingTasks(result);
+    }, [tasks]);
 
     return (
         <div>
@@ -116,11 +160,44 @@ function ProjectDetailsPage() {
                 </div>
             )}
 
+        {selectedTask && (
+            <div className="task-modal"
+                 onClick={() => setSelectedTask(null)}
+            >
+                <div className="task-modal-content"
+                     onClick={(event) => event.stopPropagation()}
+                >
+                    <h2>{selectedTask.title}</h2>
+                    <button className="task-modal-close" 
+                        onClick = {() => setSelectedTask(null)}>
+                            x
+                        </button>
+                    <p>{selectedTask.description}</p>
+                </div>
+            </div>
+        )} 
+        
         <div className="tasks-container">
            {tasks.map(task => (
                 <div className="task-card" key={task.id}>
                      <h3>{task.title}</h3>
-                      <p>{task.description}</p>
+                    <div ref={(element) => {
+                            descriptionRefs.current[task.id] = element;
+                            }}
+                         className="task-description-wrapper">
+                        <p 
+                            className="task-description"
+                        >
+                            {task.description}
+                        </p>
+                        {overflowingTasks[task.id] && (
+                            <span className="description-more"
+                                onClick={() => { console.log('CLICKED:', task);
+                                    setSelectedTask(task);
+                                }}
+                            >...</span>
+                        )}
+                    </div>
                     <div className="task-meta">
                         <div>
                             <span className="meta-label">Status</span>
