@@ -9,7 +9,7 @@ function ProjectDetailsPage() {
     const descriptionRefs = useRef({});
     const [overflowingTasks, setOverflowingTasks] = useState({});
     const [selectedTask, setSelectedTask] = useState(null);
-    console.log('SELECTED TASK:', selectedTask);
+    const [editingTask, setEditingTask] = useState(null);
 
     const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
     const [taskTitle, setTaskTitle] = useState('');
@@ -17,11 +17,31 @@ function ProjectDetailsPage() {
     const [taskPriority, setTaskPriority] = useState('Low');
     const [taskStatus, setTaskStatus] = useState('Todo');
     const [taskDueDate, setTaskDueDate] = useState('');
+
+    const deleteTask = (taskId) => {
+         fetch(`http://localhost:3000/api/tasks/${taskId}`, {
+            method: 'DELETE'
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete task')
+            }
+
+            setTasks(prevTasks => 
+                prevTasks.filter(task => task.id !== taskId)
+            );
+        })
+        .catch(error => {
+            console.error('ERROR', error)
+        });
+    }
+
     const manualCreateTask = () => {
         if (!taskTitle.trim()) {
             alert('Task title is required');
                 return;
         }
+
 
         const newTask = {
         title: taskTitle,
@@ -109,14 +129,14 @@ function ProjectDetailsPage() {
 
                     <label>
                         Task title
-                        <input type="text" placeholder="Enter task title"
+                        <input className = "form-input" type="text" placeholder="Enter task title"
                         value={taskTitle}
                         onChange={(event)=> setTaskTitle(event.target.value)}/>
                     </label>
 
                     <label>
                         Description
-                        <textarea placeholder="Enter task description"
+                        <textarea className = "form-textarea" placeholder="Enter task description"
                          value={taskDescription}
                         onChange={(event)=> setTaskDescription(event.target.value)}/>
                     </label>
@@ -128,7 +148,7 @@ function ProjectDetailsPage() {
 
                             <option value="Low">Low</option>
                             <option value="Medium">Medium</option>
-                            <option value="Hard">Hard</option>
+                            <option value="High">High</option>
                         </select>
                     </label>
 
@@ -176,6 +196,108 @@ function ProjectDetailsPage() {
                 </div>
             </div>
         )} 
+
+        {editingTask && (
+            <div className="task-modal"
+                 onClick={() => setEditingTask(null)}
+            >
+                <div className="task-modal-content"
+                     onClick={(event) => event.stopPropagation()}
+                >
+                    <h2>Edit task</h2>
+                  <div className="edit-task-form">
+                        <label>
+                            Title
+                            <input  type="text"
+                        className = "form-input"
+                        value={editingTask.title}
+                        onChange={(event) => setEditingTask({...editingTask, title: event.target.value})}
+                    />
+                    </label>
+
+                    <label>
+                        Description
+                    
+                    <textarea
+                        className="form-textarea"
+                        value={editingTask.description}
+                        onChange={(event) => setEditingTask({...editingTask, description: event.target.value})
+                    }
+                    />
+                    </label>
+
+                    <label>
+                        Status
+                        <select
+                            value={editingTask.status}
+                            onChange={(event) => setEditingTask({...editingTask, status: event.target.value})
+                           }
+                        >
+
+                            <option value="Todo">Todo</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Done">Done</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Priority
+                        <select
+                            value={editingTask.priority}
+                            onChange={(event) => setEditingTask({...editingTask, priority: event.target.value})
+                          }
+                        >
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+
+                        </select>
+                    </label>
+
+                    <label>
+                        Due Date
+                        <input type="date"
+                            value={editingTask.dueDate || ''}
+                            onChange={(event) => setEditingTask({...editingTask, dueDate: event.target.value})}
+                        />
+                    </label>
+
+                    <button onClick = {() =>
+                        fetch(`http://localhost:3000/api/tasks/${editingTask.id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(editingTask)
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+
+                                setTasks(prevTasks => 
+                                    prevTasks.map(task => 
+                                        task.id === data.id ? data : task
+                                    )
+                                );
+
+                                setEditingTask(null);
+                            }) 
+                            .catch(error => {
+                                console.error('ERROR:', error);
+                            })
+                    }>
+                        Save
+                    </button>
+                       
+                    
+
+                    <button className="task-modal-close" 
+                        onClick = {() => setEditingTask(null)}>
+                            x
+                        </button>
+                </div>
+              </div>
+            </div>
+        )} 
         
         <div className="tasks-container">
            {tasks.map(task => (
@@ -192,8 +314,7 @@ function ProjectDetailsPage() {
                         </p>
                         {overflowingTasks[task.id] && (
                             <span className="description-more"
-                                onClick={() => { console.log('CLICKED:', task);
-                                    setSelectedTask(task);
+                                onClick={() => {setSelectedTask(task);
                                 }}
                             >...</span>
                         )}
@@ -214,6 +335,24 @@ function ProjectDetailsPage() {
                             <span className="meta-label">Due date</span>
                             <span>{task.dueDate || '-'}</span>
                         </div>
+                    <div className="task-edit-button">
+                        <button onClick={() => setEditingTask(task)}>
+                        Edit
+                        </button>
+                    </div>
+
+                    <div className="task-delete-button">
+                        <button onClick={() => {
+                            const confirmed = window.confirm(
+                                'Are you sure you want to delete this task?'
+                            );
+
+                            if (confirmed) {
+                                deleteTask(task.id);
+                            }
+                          }}
+                        >Delete</button>
+                    </div>
                 </div>
               ))}
             </div>
