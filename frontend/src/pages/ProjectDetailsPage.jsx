@@ -5,6 +5,7 @@ function ProjectDetailsPage() {
     const { id } = useParams();
     const [project, setProject] = useState(null);
     const [tasks, setTasks] = useState([]);
+    const [filterStatus, setFilterStatus] = useState('All')
 
     const descriptionRefs = useRef({});
     const [overflowingTasks, setOverflowingTasks] = useState({});
@@ -106,6 +107,10 @@ function ProjectDetailsPage() {
 
         setOverflowingTasks(result);
     }, [tasks]);
+
+    const filteredTasks = filterStatus === 'All'
+                ? tasks
+                : tasks.filter(task => task.status === filterStatus);
 
     return (
         <div>
@@ -299,8 +304,18 @@ function ProjectDetailsPage() {
             </div>
         )} 
         
+        <div className="task-filter">
+            <select value={filterStatus} onChange={(event) => setFilterStatus(event.target.value)}>
+                <option value="All">All</option>
+                <option value="Todo">Todo</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Done">Done</option>
+            </select>
+        </div>
+    
+
         <div className="tasks-container">
-           {tasks.map(task => (
+           {filteredTasks.map(task => (
                 <div className="task-card" key={task.id}>
                      <h3>{task.title}</h3>
                     <div ref={(element) => {

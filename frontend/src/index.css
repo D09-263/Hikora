@@ -110,6 +110,10 @@ code {
   background: var(--code-bg);
 }
 
+html{
+  scrollbar-gutter: stable;
+}
+
 .project-info{
 border: 1px solid #0f0913;
 margin-bottom: 24px;
@@ -164,6 +168,25 @@ margin-bottom: 24px;
   font-size: 14px;
   resize: vertical;
 }
+
+.tasks-container{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+.task-filter{
+  margin-bottom: 24px;
+}
+
+.task-filter select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 
 .task-card {
   padding: 16px;
@@ -262,14 +285,6 @@ margin-bottom: 24px;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   opacity: 0.6;
-}
-
-
-.tasks-container{
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
-  align-items: stretch;
 }
 
 .task-status{
