@@ -199,6 +199,7 @@ margin-bottom: 24px;
   display: flex;
   flex-direction: column;
   position: relative;
+  border-radius: 17px;
 }
 
 
@@ -366,4 +367,24 @@ margin-bottom: 24px;
   gap: 6px;
 }
 
+/* for projects page*/
 
+.projects-container{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.project-card{
+  padding: 20px;
+  border: 1px solid #090149;
+  border-radius: 10px;
+  box-sizing: border-box;
+  background: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(9, 1, 73, 0.3);
+}

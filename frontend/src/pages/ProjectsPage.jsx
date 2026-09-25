@@ -16,8 +16,10 @@ function ProjectsPage() {
         <div>
             <h1>Projects</h1>
 
-            {projects.map(project => (
-                <div key={project.id}>
+
+            <div className="projects-container">
+                {projects.map(project => (
+                <div key={project.id} className="project-card">
                     <h2>
                          <Link to={`/projects/${project.id}`}>
                              {project.name}
@@ -25,7 +27,8 @@ function ProjectsPage() {
                     </h2>
                     <p>{project.description}</p>
                 </div>
-            ))}
+               ))}
+            </div>
         </div>
     );
 }
