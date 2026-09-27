@@ -124,7 +124,7 @@ function ProjectDetailsPage() {
 
         <div className="tasks-section">
             <h2 className="tasks-title">Tasks</h2>
-            <button className="add-task-button" onClick={() => setIsTaskFormOpen(true)}>
+            <button className="add-task-button add-button" onClick={() => setIsTaskFormOpen(true)}>
                 Add task     
             </button>
 
@@ -186,14 +186,14 @@ function ProjectDetailsPage() {
             )}
 
         {selectedTask && (
-            <div className="task-modal"
+            <div className="modal"
                  onClick={() => setSelectedTask(null)}
             >
-                <div className="task-modal-content"
+                <div className="modal-content"
                      onClick={(event) => event.stopPropagation()}
                 >
                     <h2>{selectedTask.title}</h2>
-                    <button className="task-modal-close" 
+                    <button className="modal-close" 
                         onClick = {() => setSelectedTask(null)}>
                             x
                         </button>
@@ -203,10 +203,10 @@ function ProjectDetailsPage() {
         )} 
 
         {editingTask && (
-            <div className="task-modal"
+            <div className="modal"
                  onClick={() => setEditingTask(null)}
             >
-                <div className="task-modal-content"
+                <div className="modal-content"
                      onClick={(event) => event.stopPropagation()}
                 >
                     <h2>Edit task</h2>
@@ -295,7 +295,7 @@ function ProjectDetailsPage() {
                        
                     
 
-                    <button className="task-modal-close" 
+                    <button className="modal-close" 
                         onClick = {() => setEditingTask(null)}>
                             x
                         </button>
@@ -350,14 +350,14 @@ function ProjectDetailsPage() {
                             <span className="meta-label">Due date</span>
                             <span>{task.dueDate || '-'}</span>
                         </div>
-                    <div className="task-edit-button">
-                        <button onClick={() => setEditingTask(task)}>
+                    <div className="card-edit-button">
+                        <button className="button button-primary" onClick={() => setEditingTask(task)}>
                         Edit
                         </button>
                     </div>
 
-                    <div className="task-delete-button">
-                        <button onClick={() => {
+                    <div className="card-delete-button">
+                        <button className="button button-secondary" onClick={() => {
                             const confirmed = window.confirm(
                                 'Are you sure you want to delete this task?'
                             );

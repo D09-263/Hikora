@@ -232,7 +232,7 @@ margin-bottom: 24px;
   z-index: 10;
 }
 
-.task-modal{
+.modal{
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
@@ -242,7 +242,7 @@ margin-bottom: 24px;
   z-index: 1000;
 }
 
-.task-modal-content{
+.modal-content{
   background: white;
   color: #090149;
   width: min(600px, 90%);
@@ -255,7 +255,7 @@ margin-bottom: 24px;
   position: relative;
 }
 
-.task-modal-close{
+.modal-close{
   position: absolute;
   top: 12px;
   right: 12px;
@@ -343,13 +343,60 @@ margin-bottom: 24px;
   margin-top: 16px;
 }
 
-.task-edit-button{
+.button{
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2 ease;
+}
+
+.add-button{
+  background: #5b4bdb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-button:hover{
+  background: #4939c4;
+  transform: translateY(-1px);
+}
+
+.button-primary{
+  background: #090149;
+  color: white;
+}
+
+.button-primary:hover{
+  background: #17105f;
+  transform: translateY(-1px);
+}
+
+.button-secondary{
+  background: #f3f1f7;
+  color: #090149;
+}
+
+.button-secondary:hover{
+  background: #e7e3ef;
+  transform: translateY(-1px);
+}
+
+.card-edit-button{
   position: absolute;
   left: 12px;
   bottom: 12px;
 }
 
-.task-delete-button{
+.card-delete-button{
   position: absolute;
   right: 12px;
   bottom: 12px;
@@ -393,9 +440,14 @@ margin-bottom: 24px;
   box-sizing: border-box;
   background: white;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow-wrap: anywhere;
+  min-height: 150px;
+  position: relative;
 }
 
 .project-card:hover{
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(9, 1, 73, 0.3);
 }
+
+

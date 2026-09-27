@@ -57,6 +57,12 @@ app.post('/api/projects', (req, res) => {
         });
     }
 
+    if (description && description.length >68) {
+        return res.status(400).json({
+            error: 'Project description is too long'
+        });
+    }
+
     const createdAt = new Date().toISOString();
 
     const result = db.prepare(`
@@ -118,6 +124,12 @@ app.put('/api/projects/:id', (req, res) => {
     if (!name) {
         return res.status(400).json({
             error: 'Project name is required'
+        });
+    }
+
+    if (description && description.length >68) {
+        return res.status(400).json({
+            error: 'Project description is too long'
         });
     }
 
