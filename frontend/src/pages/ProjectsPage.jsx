@@ -106,11 +106,11 @@ function ProjectsPage() {
                         maxLength={68}
                     />
                     </label>
-                    <button onClick={createProject}>
+                    <button className="button button-secondary" onClick={createProject}>
                         Create project
                     </button>
 
-                    <button onClick={() => setIsProjectFormOpen(false)}>
+                    <button className="button button-danger" onClick={() => setIsProjectFormOpen(false)}>
                         Cancel
                     </button>
                 </div>
@@ -135,7 +135,7 @@ function ProjectsPage() {
 
                     <div className="card-delete-button">
                         
-                    <button className="button button-secondary"  onClick={()=> {
+                    <button className="button button-danger"  onClick={()=> {
                         const confirmed = window.confirm('Are you sure you want to delete this project?');
 
                         if(confirmed){
@@ -167,7 +167,7 @@ function ProjectsPage() {
                                 }
                         />
                     </label>
-                    <button onClick={updateProject}>Save</button>
+                    <button className="button button-secondary" onClick={updateProject}>Save</button>
                     <button className="modal-close" onClick={()=>setEditingProject(null)}>
                         x
                     </button>

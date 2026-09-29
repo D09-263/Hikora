@@ -175,11 +175,11 @@ function ProjectDetailsPage() {
                         onChange={(event)=> setTaskDueDate(event.target.value)}/>
                     </label>
 
-                    <button onClick={manualCreateTask}>      
+                    <button className="button button-secondary" onClick={manualCreateTask}>      
                         Create task
                     </button>
 
-                    <button onClick={() => setIsTaskFormOpen(false)}>
+                    <button className="button button-danger" onClick={() => setIsTaskFormOpen(false)}>
                         Cancel 
                     </button>
                 </div>
@@ -267,7 +267,7 @@ function ProjectDetailsPage() {
                         />
                     </label>
 
-                    <button onClick = {() =>
+                    <button className="button button-secondary" onClick = {() =>
                         fetch(`http://localhost:3000/api/tasks/${editingTask.id}`, {
                             method: 'PUT',
                             headers: {
@@ -357,7 +357,7 @@ function ProjectDetailsPage() {
                     </div>
 
                     <div className="card-delete-button">
-                        <button className="button button-secondary" onClick={() => {
+                        <button className="button button-danger" onClick={() => {
                             const confirmed = window.confirm(
                                 'Are you sure you want to delete this task?'
                             );
