@@ -24,7 +24,6 @@ function ProjectsPage() {
                 setIsLoading(false);
             })
             .catch(error => {
-                console.error('ERROR:', error);
                 setError('Failed to load projects')
                 setIsLoading(false);
             });
@@ -53,7 +52,6 @@ function ProjectsPage() {
                 return response.json();
             })
             .then(data => {
-                console.log(data);
 
                 setProjects(prevProjects => [...prevProjects, data]);
                 setIsProjectFormOpen(false);
@@ -61,7 +59,6 @@ function ProjectsPage() {
                 setProjectDescription('');
             })
             .catch(error => {
-                console.error('ERROR:', error);
                 setError('Failed to create project')
             });
                 
@@ -94,7 +91,6 @@ function ProjectsPage() {
                 setEditingProject(null);
         })
             .catch(error => {
-                console.error('ERROR:',error);
                 setError('Failed to update projects');
             });
     };
@@ -113,7 +109,6 @@ function ProjectsPage() {
             setProjects(prevProjects => prevProjects.filter(project => project.id !== projectId));
         })
         .catch(error => {
-            console.error('ERROR', error);
             setError('Failed to delete project');
         });
     }

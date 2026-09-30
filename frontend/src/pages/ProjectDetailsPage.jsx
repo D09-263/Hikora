@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+
 
 function ProjectDetailsPage() {
     const { id } = useParams();
@@ -40,7 +41,6 @@ function ProjectDetailsPage() {
                 setIsProjectLoading(false);
             })
             .catch(error => {
-                console.error('PROJECT ERROR', error);
                 setProjectError('Failed to load project name');
                 setIsProjectLoading(false);
             })
@@ -56,7 +56,6 @@ function ProjectDetailsPage() {
                 setIsTasksLoading(false);
             })
             .catch(error => {
-                console.error('TASKS ERROR:', error);
                 setTasksError('Failed to load tasks')
                 setIsTasksLoading(false);
             });
@@ -77,7 +76,6 @@ function ProjectDetailsPage() {
             );
         })
         .catch(error => {
-                console.error('ERROR:', error);
                 setError('Failed to delete tasks')
             });
     }
@@ -96,8 +94,7 @@ function ProjectDetailsPage() {
         priority: taskPriority,
         status: taskStatus,
         dueDate: taskDueDate
-        }
-        console.log(newTask);
+        };
 
         fetch(`http://localhost:3000/api/projects/${id}/tasks`, {
             method: 'POST',
@@ -113,7 +110,7 @@ function ProjectDetailsPage() {
                 return response.json();
             })
             .then(data => {
-                console.log('DATA:', data);
+
                 setTasks(prevTasks => [...prevTasks, data]);
 
                 setIsTaskFormOpen(false);
@@ -125,7 +122,6 @@ function ProjectDetailsPage() {
                 setTaskDueDate('');
             })
             .catch(error => {
-                console.error('ERROR:', error);
                 setError('Failed to create task')
             });
     };
@@ -150,6 +146,9 @@ function ProjectDetailsPage() {
 
     return (
         <div>
+            <Link to="/" className="back-button">
+                ← Back to projects
+            </Link>
             {isProjectLoading && <h1>Loading project...</h1>}
 
             {!isProjectLoading && projectError && (
@@ -157,7 +156,7 @@ function ProjectDetailsPage() {
             )}
 
             {!isProjectLoading && !projectError && project && (
-                <h1>{project.name}</h1> 
+                <h1 className="project-title">{project.name}</h1> 
             )}
 
             {project && (
@@ -343,7 +342,6 @@ function ProjectDetailsPage() {
                                 setEditingTask(null);
                             }) 
                             .catch(error => {
-                                console.error('ERROR:', error);
                                 setError('Failed to update task');
                             })
                     }}>

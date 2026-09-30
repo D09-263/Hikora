@@ -17,7 +17,6 @@
 
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
-  color-scheme: light dark;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -30,28 +29,10 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
 body {
   margin: 0;
+  background: radial-gradient(circle at 15% 20%, #ffffff 0%, transparent 35%),
+              linear-gradient(135deg, #f7f4ff 0%, #dcd6f0 100%);
 }
 
 #root {
@@ -59,7 +40,6 @@ body {
   max-width: 100%;
   margin: 0 auto;
   text-align: center;
-  border-inline: 1px solid var(--border);
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -114,8 +94,14 @@ html{
   scrollbar-gutter: stable;
 }
 
+.project-title{
+  opacity: 0.7;
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+}
+
 .project-info{
-border: 1px solid #0f0913;
+border-top: 1px solid #0f0913;
+border-bottom: 1px solid #0f0913;
 margin-bottom: 24px;
 padding: 20px;
 box-sizing:border-box;
@@ -138,8 +124,9 @@ margin-bottom: 24px;
   margin: 24px auto;
   padding: 24px;
   border: 1px solid #ccc;
+  border-radius: 25px;
   box-sizing: border-box;
-
+  background-color: #f8f9fa;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -196,6 +183,7 @@ margin-bottom: 24px;
   height: 300px;
   transition: transform 0.2s ease;
   overflow-wrap: anywhere;
+  background-color: #ffffff;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -362,6 +350,8 @@ margin-bottom: 24px;
   margin: 24px auto;
   padding: 24px;
   border: 1px solid #ccc;
+  border-radius: 25px;
+  background-color: #f8f9fa;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -400,7 +390,7 @@ margin-bottom: 24px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2 ease;
+  transition: all 0.2s ease;
 }
 
 .add-button{
@@ -460,6 +450,21 @@ margin-bottom: 24px;
 .button-danger:hover{
   background: #ad3d3d;
   transform: translateY(-1px);
+}
+
+.back-button{
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+
+@media (max-width: 600px){
+  .project-title{
+    padding-top: 45px;
+  }
 }
 
 
