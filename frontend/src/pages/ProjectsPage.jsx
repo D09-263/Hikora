@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 
 function ProjectsPage() {
     const [projects, setProjects] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
     const [projectName, setProjectName] = useState('');
     const [projectDescription, setProjectDescription] = useState('');
@@ -11,13 +13,25 @@ function ProjectsPage() {
 
     useEffect(() => {
         fetch('http://localhost:3000/api/projects')
-            .then(response => response.json())
+            .then(response=>{
+                if (!response.ok){
+                    throw new Error('Failed to load projects')
+                }
+                return response.json();
+            })
             .then(data => {
                 setProjects(data);
+                setIsLoading(false);
+            })
+            .catch(error => {
+                console.error('ERROR:', error);
+                setError('Failed to load projects')
+                setIsLoading(false);
             });
     }, []);
 
     const createProject = () => {
+        setError(null);
         if (!projectName.trim()) {
             alert('Project name is required');
             return;
@@ -32,7 +46,12 @@ function ProjectsPage() {
                 description: projectDescription
             })
         })
-            .then(response => response.json())
+            .then(response=>{
+                if (!response.ok){
+                    throw new Error('Failed to create project')
+                }
+                return response.json();
+            })
             .then(data => {
                 console.log(data);
 
@@ -43,11 +62,18 @@ function ProjectsPage() {
             })
             .catch(error => {
                 console.error('ERROR:', error);
+                setError('Failed to create project')
             });
                 
     }
 
     const updateProject =() =>{
+        setError(null);
+        if (!editingProject.name.trim()) {
+            alert('Project name is required');
+            return;
+        }
+
         fetch(`http://localhost:3000/api/projects/${editingProject.id}`, {
             method: 'PUT',
             headers: {
@@ -55,7 +81,12 @@ function ProjectsPage() {
             },
             body: JSON.stringify(editingProject)
         })
-            .then(response => response.json())
+            .then(response=>{
+                if (!response.ok){
+                    throw new Error('Failed to update projects')
+                }
+                return response.json();
+            })
             .then(data => {
                 setProjects(prevProjects => prevProjects.map(project => project.id === data.id ? data : project)
             );
@@ -64,10 +95,12 @@ function ProjectsPage() {
         })
             .catch(error => {
                 console.error('ERROR:',error);
+                setError('Failed to update projects');
             });
     };
 
     const deleteProject = (projectId) => {
+        setError(null);
          fetch(`http://localhost:3000/api/projects/${projectId}`, {
             method: 'DELETE'
          })
@@ -81,6 +114,7 @@ function ProjectsPage() {
         })
         .catch(error => {
             console.error('ERROR', error);
+            setError('Failed to delete project');
         });
     }
 
@@ -116,6 +150,10 @@ function ProjectsPage() {
                 </div>
             )}
 
+            {isLoading && <p>Loading...</p>}
+
+            {error && <p>{error}</p>}
+
 
             <div className="projects-container">
                 {projects.map(project => (
@@ -150,8 +188,8 @@ function ProjectsPage() {
             </div>
 
             {editingProject && (
-                <div className="modal edit-project-modal">
-                  <div className="modal-content edit-project-modal-content">  
+                <div className="modal edit-project-modal" onClick={() => setEditingProject(null)}>
+                  <div className="modal-content edit-project-modal-content" onClick={(event) => event.stopPropagation()}>  
                     <label>
                         Project name:
                         <input className="form-input" type="text" value={editingProject.name}

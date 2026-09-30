@@ -5,6 +5,11 @@ function ProjectDetailsPage() {
     const { id } = useParams();
     const [project, setProject] = useState(null);
     const [tasks, setTasks] = useState([]);
+    const [isProjectLoading, setIsProjectLoading] = useState(true);
+    const [isTasksLoading, setIsTasksLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [projectError, setProjectError] = useState(null);
+    const [tasksError, setTasksError] = useState(null);
     const [filterStatus, setFilterStatus] = useState('All')
 
     const descriptionRefs = useRef({});
@@ -19,7 +24,46 @@ function ProjectDetailsPage() {
     const [taskStatus, setTaskStatus] = useState('Todo');
     const [taskDueDate, setTaskDueDate] = useState('');
 
+    useEffect(() => {
+        setProjectError(null);
+        setTasksError(null);
+        
+        fetch(`http://localhost:3000/api/projects/${id}`)
+            .then(response=>{
+                if (!response.ok){
+                    throw new Error('Failed to load project name');
+                }
+                return response.json();
+            })
+            .then(data => {
+                setProject(data);
+                setIsProjectLoading(false);
+            })
+            .catch(error => {
+                console.error('PROJECT ERROR', error);
+                setProjectError('Failed to load project name');
+                setIsProjectLoading(false);
+            })
+        fetch(`http://localhost:3000/api/projects/${id}/tasks`)
+             .then(response=>{
+                if (!response.ok){
+                    throw new Error('Failed to load project tasks')
+                }
+                return response.json();
+            })
+            .then(data => {
+                setTasks(data);
+                setIsTasksLoading(false);
+            })
+            .catch(error => {
+                console.error('TASKS ERROR:', error);
+                setTasksError('Failed to load tasks')
+                setIsTasksLoading(false);
+            });
+    }, [id]);
+
     const deleteTask = (taskId) => {
+        setError(null);
          fetch(`http://localhost:3000/api/tasks/${taskId}`, {
             method: 'DELETE'
     })
@@ -33,11 +77,13 @@ function ProjectDetailsPage() {
             );
         })
         .catch(error => {
-            console.error('ERROR', error)
-        });
+                console.error('ERROR:', error);
+                setError('Failed to delete tasks')
+            });
     }
 
     const manualCreateTask = () => {
+        setError(null);
         if (!taskTitle.trim()) {
             alert('Task title is required');
                 return;
@@ -60,8 +106,10 @@ function ProjectDetailsPage() {
             },
             body: JSON.stringify(newTask)
         })
-            .then(response => {
-                console.log('STATUS:', response.status);
+            .then(response=>{
+                if (!response.ok){
+                    throw new Error('Failed to create task')
+                }
                 return response.json();
             })
             .then(data => {
@@ -78,21 +126,9 @@ function ProjectDetailsPage() {
             })
             .catch(error => {
                 console.error('ERROR:', error);
+                setError('Failed to create task')
             });
     };
-
-    useEffect(() => {
-        fetch(`http://localhost:3000/api/projects/${id}`)
-            .then(response => response.json())
-            .then(data => {
-                setProject(data);
-            });
-        fetch(`http://localhost:3000/api/projects/${id}/tasks`)
-             .then(response => response.json())
-            .then(data => {
-                setTasks(data);
-            });
-    }, [id]);
 
     useEffect(() => {
         const result = {};
@@ -114,7 +150,15 @@ function ProjectDetailsPage() {
 
     return (
         <div>
-            {project && <h1>{project.name}</h1>}
+            {isProjectLoading && <h1>Loading project...</h1>}
+
+            {!isProjectLoading && projectError && (
+                <h1>{projectError}</h1>
+            )}
+
+            {!isProjectLoading && !projectError && project && (
+                <h1>{project.name}</h1> 
+            )}
 
             {project && (
                 <div className="project-info">
@@ -184,6 +228,8 @@ function ProjectDetailsPage() {
                     </button>
                 </div>
             )}
+
+            {error && <p>{error}</p>}
 
         {selectedTask && (
             <div className="modal"
@@ -267,7 +313,12 @@ function ProjectDetailsPage() {
                         />
                     </label>
 
-                    <button className="button button-secondary" onClick = {() =>
+                    <button className="button button-secondary" onClick = {() =>{
+                        if (!editingTask.title.trim()) {
+                            alert('Task title is required');
+                            return;
+                        }
+
                         fetch(`http://localhost:3000/api/tasks/${editingTask.id}`, {
                             method: 'PUT',
                             headers: {
@@ -275,7 +326,12 @@ function ProjectDetailsPage() {
                             },
                             body: JSON.stringify(editingTask)
                         })
-                            .then(response => response.json())
+                            .then(response=>{
+                                if (!response.ok){
+                                throw new Error('Failed to update task')
+                                }
+                                return response.json();
+                            })
                             .then(data => {
 
                                 setTasks(prevTasks => 
@@ -288,8 +344,9 @@ function ProjectDetailsPage() {
                             }) 
                             .catch(error => {
                                 console.error('ERROR:', error);
+                                setError('Failed to update task');
                             })
-                    }>
+                    }}>
                         Save
                     </button>
                        
@@ -313,7 +370,13 @@ function ProjectDetailsPage() {
             </select>
         </div>
     
+            {isTasksLoading && <p>Loading tasks...</p>}
+            
+            {!isTasksLoading && tasksError && (
+                <p>{tasksError}</p>
+            )}
 
+        {!isTasksLoading && !tasksError &&  (
         <div className="tasks-container">
            {filteredTasks.map(task => (
                 <div className="task-card" key={task.id}>
@@ -371,9 +434,11 @@ function ProjectDetailsPage() {
                 </div>
               ))}
             </div>
+        )}
         </div>
     </div>
 );}
+
 
 
 export default ProjectDetailsPage;
