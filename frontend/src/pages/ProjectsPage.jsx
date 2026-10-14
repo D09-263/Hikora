@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import API_URL from '../api';
 
 function ProjectsPage() {
     const [projects, setProjects] = useState([]);
@@ -12,7 +13,7 @@ function ProjectsPage() {
     const [editingProject, setEditingProject] = useState(null);
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/projects')
+        fetch(`${API_URL}/api/projects`)
             .then(response=>{
                 if (!response.ok){
                     throw new Error('Failed to load projects')
@@ -35,7 +36,7 @@ function ProjectsPage() {
             alert('Project name is required');
             return;
         }
-         fetch('http://localhost:3000/api/projects', {
+         fetch(`${API_URL}/api/projects`, {
             method: 'POST',
             headers:{
                 'Content-Type': 'application/json'
@@ -71,7 +72,7 @@ function ProjectsPage() {
             return;
         }
 
-        fetch(`http://localhost:3000/api/projects/${editingProject.id}`, {
+        fetch(`${API_URL}/api/projects/${editingProject.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -97,7 +98,7 @@ function ProjectsPage() {
 
     const deleteProject = (projectId) => {
         setError(null);
-         fetch(`http://localhost:3000/api/projects/${projectId}`, {
+         fetch(`${API_URL}/api/projects/${projectId}`, {
             method: 'DELETE'
          })
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import API_URL from '../api';
 
 
 function ProjectDetailsPage() {
@@ -29,7 +30,7 @@ function ProjectDetailsPage() {
         setProjectError(null);
         setTasksError(null);
         
-        fetch(`http://localhost:3000/api/projects/${id}`)
+        fetch(`${API_URL}/api/projects/${id}`)
             .then(response=>{
                 if (!response.ok){
                     throw new Error('Failed to load project name');
@@ -44,7 +45,7 @@ function ProjectDetailsPage() {
                 setProjectError('Failed to load project name');
                 setIsProjectLoading(false);
             })
-        fetch(`http://localhost:3000/api/projects/${id}/tasks`)
+        fetch(`${API_URL}/api/projects/${id}/tasks`)
              .then(response=>{
                 if (!response.ok){
                     throw new Error('Failed to load project tasks')
@@ -63,7 +64,7 @@ function ProjectDetailsPage() {
 
     const deleteTask = (taskId) => {
         setError(null);
-         fetch(`http://localhost:3000/api/tasks/${taskId}`, {
+         fetch(`${API_URL}/api/tasks/${taskId}`, {
             method: 'DELETE'
     })
         .then(response => {
@@ -96,7 +97,7 @@ function ProjectDetailsPage() {
         dueDate: taskDueDate
         };
 
-        fetch(`http://localhost:3000/api/projects/${id}/tasks`, {
+        fetch(`${API_URL}/api/projects/${id}/tasks`, {
             method: 'POST',
             headers:{
                 'Content-Type': 'application/json'
@@ -117,7 +118,7 @@ function ProjectDetailsPage() {
 
                 setTaskTitle('');
                 setTaskDescription('');
-                setTaskPriority('Medium');
+                setTaskPriority('Low');
                 setTaskStatus('Todo');
                 setTaskDueDate('');
             })
@@ -318,7 +319,7 @@ function ProjectDetailsPage() {
                             return;
                         }
 
-                        fetch(`http://localhost:3000/api/tasks/${editingTask.id}`, {
+                        fetch(`${API_URL}/api/tasks/${editingTask.id}`, {
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json'
