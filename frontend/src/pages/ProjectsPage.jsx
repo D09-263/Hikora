@@ -6,6 +6,7 @@ import {
     updateProject as updateProjectRequest,
     deleteProject as deleteProjectRequest
 } from '../services/projectsService';
+import ProjectCard from '../components/ProjectCard';
 
 function ProjectsPage() {
     const [projects, setProjects] = useState([]);
@@ -71,7 +72,7 @@ function ProjectsPage() {
             setEditingProject(null);
         })
             .catch(() => {
-                setError('Failed to update projects');
+                setError('Failed to update project');
             });
     };
 
@@ -127,35 +128,14 @@ function ProjectsPage() {
 
 
             <div className="projects-container">
-                {projects.map(project => (
-                <div key={project.id} className="project-card">
-                    <h2>
-                         <Link to={`/projects/${project.id}`}>
-                             {project.name}
-                           </Link>
-                    </h2>
-                    <p>{project.description}</p>
-                   
-                   <div className="card-edit-button">
-                    <button className="button button-primary" onClick={() => setEditingProject(project)}>
-                        Edit
-                    </button>
-                    </div>
-
-                    <div className="card-delete-button">
-                        
-                    <button className="button button-danger"  onClick={()=> {
-                        const confirmed = window.confirm('Are you sure you want to delete this project?');
-
-                        if(confirmed){
-                            deleteProject(project.id);
-                        }
-                    }}>
-                        Delete
-                    </button>
-                    </div>
-                </div>
-               ))}
+                {projects.map((project) => (
+                    <ProjectCard
+                        key={project.id}
+                        project={project}
+                        onEdit={setEditingProject}
+                        onDelete={deleteProject}
+                    />
+                ))}
             </div>
 
             {editingProject && (

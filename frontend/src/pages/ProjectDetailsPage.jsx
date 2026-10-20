@@ -7,6 +7,7 @@ import {
     updateTask as updateTaskRequest,
     deleteTask as deleteTaskRequest
 } from '../services/projectDetailsService';
+import TaskCard from '../components/TaskCard';
 
 
 function ProjectDetailsPage() {
@@ -61,7 +62,7 @@ function ProjectDetailsPage() {
     const deleteTask = (taskId) => {
         setError(null);
         deleteTaskRequest(taskId)
-        .then(response => {
+        .then(() => {
             setTasks(prevTasks => 
                 prevTasks.filter(task => task.id !== taskId)
             );
@@ -341,65 +342,24 @@ function ProjectDetailsPage() {
                 <p>{tasksError}</p>
             )}
 
-        {!isTasksLoading && !tasksError &&  (
-        <div className="tasks-container">
-           {filteredTasks.map(task => (
-                <div className="task-card" key={task.id}>
-                     <h3>{task.title}</h3>
-                    <div ref={(element) => {
-                            descriptionRefs.current[task.id] = element;
+            {!isTasksLoading && !tasksError &&  (
+
+                <div className="tasks-container">
+                   {filteredTasks.map(task => (
+                        <TaskCard
+                            key={task.id}
+                            task={task}
+                            descriptionRef={(element) => {
+                                descriptionRefs.current[task.id] = element;
                             }}
-                         className="task-description-wrapper">
-                        <p 
-                            className="task-description"
-                        >
-                            {task.description}
-                        </p>
-                        {overflowingTasks[task.id] && (
-                            <span className="description-more"
-                                onClick={() => {setSelectedTask(task);
-                                }}
-                            >...</span>
-                        )}
-                    </div>
-                    <div className="task-meta">
-                        <div>
-                            <span className="meta-label">Status</span>
-                            <span className={`task-status ${task.status.toLowerCase().replace(' ', '-')}`}>
-                                {task.status}</span>
-                        </div>
-                        <div>
-                            <span className="meta-label">Priority</span>
-                            <span className={`task-priority ${task.priority.toLowerCase()}`}>
-                                {task.priority}</span>
-                        </div>
-                    </div>
-                        <div className="task-due-date">
-                            <span className="meta-label">Due date</span>
-                            <span>{task.dueDate || '-'}</span>
-                        </div>
-                    <div className="card-edit-button">
-                        <button className="button button-primary" onClick={() => setEditingTask(task)}>
-                        Edit
-                        </button>
-                    </div>
-
-                    <div className="card-delete-button">
-                        <button className="button button-danger" onClick={() => {
-                            const confirmed = window.confirm(
-                                'Are you sure you want to delete this task?'
-                            );
-
-                            if (confirmed) {
-                                deleteTask(task.id);
-                            }
-                          }}
-                        >Delete</button>
-                    </div>
+                            isDescriptionOverflowing={overflowingTasks[task.id]}
+                            onShowDescription={setSelectedTask}
+                            onEdit={setEditingTask}
+                            onDelete={deleteTask}
+                        />
+                    ))}
                 </div>
-              ))}
-            </div>
-        )}
+                )}
         </div>
     </div>
 );}
