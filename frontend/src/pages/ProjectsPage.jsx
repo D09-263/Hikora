@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import API_URL from '../api';
+import {
+    getProjects,
+    createProject as createProjectRequest,
+    updateProject as updateProjectRequest,
+    deleteProject as deleteProjectRequest
+} from '../services/projectsService';
 
 function ProjectsPage() {
     const [projects, setProjects] = useState([]);
@@ -13,106 +18,76 @@ function ProjectsPage() {
     const [editingProject, setEditingProject] = useState(null);
 
     useEffect(() => {
-        fetch(`${API_URL}/api/projects`)
-            .then(response=>{
-                if (!response.ok){
-                    throw new Error('Failed to load projects')
-                }
-                return response.json();
-            })
+        getProjects()
             .then(data => {
                 setProjects(data);
                 setIsLoading(false);
             })
-            .catch(error => {
-                setError('Failed to load projects')
+            .catch(() => {
+                setError('Failed to load projects');
                 setIsLoading(false);
             });
     }, []);
 
     const createProject = () => {
         setError(null);
+
         if (!projectName.trim()) {
             alert('Project name is required');
             return;
         }
-         fetch(`${API_URL}/api/projects`, {
-            method: 'POST',
-            headers:{
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: projectName,
-                description: projectDescription
-            })
-        })
-            .then(response=>{
-                if (!response.ok){
-                    throw new Error('Failed to create project')
-                }
-                return response.json();
-            })
-            .then(data => {
 
+        createProjectRequest({
+            name: projectName,
+            description: projectDescription
+        })
+            .then(data => {
                 setProjects(prevProjects => [...prevProjects, data]);
                 setIsProjectFormOpen(false);
                 setProjectName('');
                 setProjectDescription('');
             })
-            .catch(error => {
-                setError('Failed to create project')
+            .catch(() => {
+                setError('Failed to create project');
             });
-                
-    }
+    };
 
-    const updateProject =() =>{
+    const updateProject = () => {
         setError(null);
+
         if (!editingProject.name.trim()) {
             alert('Project name is required');
             return;
         }
 
-        fetch(`${API_URL}/api/projects/${editingProject.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(editingProject)
-        })
-            .then(response=>{
-                if (!response.ok){
-                    throw new Error('Failed to update projects')
-                }
-                return response.json();
-            })
+        updateProjectRequest(editingProject.id, editingProject)
             .then(data => {
-                setProjects(prevProjects => prevProjects.map(project => project.id === data.id ? data : project)
-            );
+                setProjects(prevProjects =>
+                    prevProjects.map(project =>
+                        project.id === data.id ? data : project
+                    )
+                );
 
-                setEditingProject(null);
+            setEditingProject(null);
         })
-            .catch(error => {
+            .catch(() => {
                 setError('Failed to update projects');
             });
     };
 
     const deleteProject = (projectId) => {
         setError(null);
-         fetch(`${API_URL}/api/projects/${projectId}`, {
-            method: 'DELETE'
-         })
 
-         .then(response => {
-            if (!response.ok){
-                throw new Error('Failed to delete project');
-            }
-
-            setProjects(prevProjects => prevProjects.filter(project => project.id !== projectId));
-        })
-        .catch(error => {
-            setError('Failed to delete project');
-        });
-    }
+        deleteProjectRequest(projectId)
+            .then(() => {
+                setProjects(prevProjects =>
+                    prevProjects.filter(project => project.id !== projectId)
+                );
+            })
+            .catch(() => {
+                setError('Failed to delete project');
+            });
+    };
 
     return (
         <div>

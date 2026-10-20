@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import API_URL from '../api';
+import {
+    getProject,
+    getProjectTasks,
+    createTask as createTaskRequest,
+    updateTask as updateTaskRequest,
+    deleteTask as deleteTaskRequest
+} from '../services/projectDetailsService';
 
 
 function ProjectDetailsPage() {
@@ -29,34 +35,24 @@ function ProjectDetailsPage() {
     useEffect(() => {
         setProjectError(null);
         setTasksError(null);
+        setIsProjectLoading(true);
+        setIsTasksLoading(true);
         
-        fetch(`${API_URL}/api/projects/${id}`)
-            .then(response=>{
-                if (!response.ok){
-                    throw new Error('Failed to load project name');
-                }
-                return response.json();
-            })
+        getProject(id)
             .then(data => {
                 setProject(data);
                 setIsProjectLoading(false);
             })
-            .catch(error => {
+            .catch(() => {
                 setProjectError('Failed to load project name');
                 setIsProjectLoading(false);
             })
-        fetch(`${API_URL}/api/projects/${id}/tasks`)
-             .then(response=>{
-                if (!response.ok){
-                    throw new Error('Failed to load project tasks')
-                }
-                return response.json();
-            })
+        getProjectTasks(id)
             .then(data => {
                 setTasks(data);
                 setIsTasksLoading(false);
             })
-            .catch(error => {
+            .catch(() => {
                 setTasksError('Failed to load tasks')
                 setIsTasksLoading(false);
             });
@@ -64,19 +60,13 @@ function ProjectDetailsPage() {
 
     const deleteTask = (taskId) => {
         setError(null);
-         fetch(`${API_URL}/api/tasks/${taskId}`, {
-            method: 'DELETE'
-    })
+        deleteTaskRequest(taskId)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to delete task')
-            }
-
             setTasks(prevTasks => 
                 prevTasks.filter(task => task.id !== taskId)
             );
         })
-        .catch(error => {
+        .catch(() => {
                 setError('Failed to delete tasks')
             });
     }
@@ -97,19 +87,7 @@ function ProjectDetailsPage() {
         dueDate: taskDueDate
         };
 
-        fetch(`${API_URL}/api/projects/${id}/tasks`, {
-            method: 'POST',
-            headers:{
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(newTask)
-        })
-            .then(response=>{
-                if (!response.ok){
-                    throw new Error('Failed to create task')
-                }
-                return response.json();
-            })
+        createTaskRequest(id, newTask)
             .then(data => {
 
                 setTasks(prevTasks => [...prevTasks, data]);
@@ -319,19 +297,7 @@ function ProjectDetailsPage() {
                             return;
                         }
 
-                        fetch(`${API_URL}/api/tasks/${editingTask.id}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(editingTask)
-                        })
-                            .then(response=>{
-                                if (!response.ok){
-                                throw new Error('Failed to update task')
-                                }
-                                return response.json();
-                            })
+                        updateTaskRequest(editingTask.id, editingTask)
                             .then(data => {
 
                                 setTasks(prevTasks => 
