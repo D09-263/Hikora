@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const db = require('./database/database');
+const projectRepository = require('./repositories/projectRepository');
 const express = require('express');
 const cors = require('cors');
 
@@ -29,15 +30,13 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/projects', (req, res) => {
-    const projects = db.prepare('SELECT * FROM projects').all();
+    const projects = projectRepository.getAllProjects();
 
     res.json(projects);
 });
 
 app.get('/api/projects/:id', validateId, (req, res) => {
-    const project = db.prepare(`
-        SELECT * FROM projects WHERE id = ?
-    `).get(req.params.id);
+    const project = projectRepository.getProjectById(req.params.id);
 
     if (!project) {
         return res.status(404).json({
@@ -76,16 +75,7 @@ app.post('/api/projects', (req, res) => {
         });
     }
 
-    const createdAt = new Date().toISOString();
-
-    const result = db.prepare(`
-        INSERT INTO projects (name, description, createdAt)
-        VALUES (?, ?, ?)
-    `).run(name, description || null, createdAt);
-
-    const project = db.prepare(`
-        SELECT * FROM projects WHERE id = ?
-    `).get(result.lastInsertRowid);
+    const project = projectRepository.createProject(name, description);
 
     res.status(201).json(project);
 });
@@ -140,7 +130,7 @@ app.post('/api/projects/:id/tasks', validateId, (req, res) => {
 
 app.put('/api/projects/:id', validateId, (req, res) => {
     const { name, description } = req.body;
-    const projectId = req.params.id;
+    const id = Number(req.params.id);
 
     if (!name) {
         return res.status(400).json({
@@ -148,29 +138,23 @@ app.put('/api/projects/:id', validateId, (req, res) => {
         });
     }
 
-    if (description && description.length >68) {
+    if (description && description.length > 68) {
         return res.status(400).json({
             error: 'Project description is too long'
         });
     }
 
-    const result = db.prepare(`
-        UPDATE projects
-        SET name = ?, description = ?
-        WHERE id = ?
-    `).run(name, description || null, projectId);
+    const existingProject = projectRepository.getProjectById(id);
 
-    if (result.changes === 0) {
-        return res.status(404).json({
+    if (!existingProject) {
+        return res.status(400).json({
             error: 'Project not found'
         });
     }
 
-    const project = db.prepare(`
-        SELECT * FROM projects WHERE id = ?
-    `).get(projectId);
+    const updateProject = projectRepository.updateProject(id, name, description);
 
-    res.json(project);
+    res.json(updateProject);
 });
 
 app.put('/api/tasks/:id', validateId, (req, res) => {
@@ -215,16 +199,12 @@ app.put('/api/tasks/:id', validateId, (req, res) => {
 });
 
 app.delete('/api/projects/:id', validateId, (req, res) => {
+    const id = Number(req.params.id);
 
-    const projectId = req.params.id;
 
+    const deleted = projectRepository.deleteProject(id);
 
-    const result = db.prepare(`
-        DELETE FROM projects
-        WHERE id = ?
-    `).run(projectId);
-
-    if (result.changes === 0) {
+    if (!deleted){
         return res.status(404).json({
             error: 'Project not found'
         });
