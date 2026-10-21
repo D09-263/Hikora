@@ -1,7 +1,7 @@
 require('dotenv').config();
 
-const db = require('./database/database');
 const projectRepository = require('./repositories/projectRepository');
+const taskRepository = require('./repositories/taskRepository');
 const express = require('express');
 const cors = require('cors');
 
@@ -48,12 +48,9 @@ app.get('/api/projects/:id', validateId, (req, res) => {
 });
 
 app.get('/api/projects/:id/tasks', validateId, (req, res) => {
-    const projectId = req.params.id;
+    const projectId = Number(req.params.id);
 
-    const tasks = db.prepare(`
-        SELECT * FROM tasks
-        WHERE projectId = ?
-    `).all(projectId);
+    const tasks = taskRepository.getTasksByProjectId(projectId);
 
     res.json(tasks);
 });
@@ -81,8 +78,8 @@ app.post('/api/projects', (req, res) => {
 });
 
 app.post('/api/projects/:id/tasks', validateId, (req, res) => {
-    const projectId = req.params.id;
-    const project = db.prepare('SELECT id FROM projects WHERE id = ?').get(projectId);
+    const projectId = Number(req.params.id);
+    const project = projectRepository.getProjectById(projectId);
 
     if (!project) {
         return res.status(404).json({
@@ -98,32 +95,14 @@ app.post('/api/projects/:id/tasks', validateId, (req, res) => {
         });
     }
 
-    const createdAt = new Date().toISOString();
-
-    const result = db.prepare(`
-        INSERT INTO tasks (
-            projectId,
-            title,
-            description,
-            status,
-            priority,
-            dueDate,
-            createdAt
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(
+    const task = taskRepository.createTask(
         projectId,
         title,
-        description || null,
+        description,
         status || 'Todo',
-        priority || 'Medium',
-        dueDate || null,
-        createdAt
+        priority || 'Low',
+        dueDate
     );
-
-    const task = db.prepare(`
-        SELECT * FROM tasks WHERE id = ?
-    `).get(result.lastInsertRowid);
 
     res.status(201).json(task);
 });
@@ -147,7 +126,7 @@ app.put('/api/projects/:id', validateId, (req, res) => {
     const existingProject = projectRepository.getProjectById(id);
 
     if (!existingProject) {
-        return res.status(400).json({
+        return res.status(404).json({
             error: 'Project not found'
         });
     }
@@ -158,7 +137,7 @@ app.put('/api/projects/:id', validateId, (req, res) => {
 });
 
 app.put('/api/tasks/:id', validateId, (req, res) => {
-    const taskId = req.params.id;
+    const taskId = Number(req.params.id);
     const { title, description, status, priority, dueDate } = req.body;
 
     if (!title) {
@@ -167,35 +146,24 @@ app.put('/api/tasks/:id', validateId, (req, res) => {
         });
     }
 
-    const result = db.prepare(`
-        UPDATE tasks
-        SET
-            title = ?,
-            description = ?,
-            status = ?,
-            priority = ?,
-            dueDate = ?
-        WHERE id = ?
-    `).run(
-        title,
-        description || null,
-        status || 'Todo',
-        priority || 'Medium',
-        dueDate || null,
-        taskId
-    );
+    const existingTask = taskRepository.getTaskById(taskId);
 
-    if (result.changes === 0) {
+    if (!existingTask) {
         return res.status(404).json({
             error: 'Task not found'
         });
     }
 
-    const task = db.prepare(`
-        SELECT * FROM tasks WHERE id = ?
-    `).get(taskId);
+    const updatedTask = taskRepository.updateTask(
+        taskId,
+        title,
+        description,
+        status || 'Todo',
+        priority || 'Low',
+        dueDate
+    );
 
-    res.json(task);
+    res.json(updatedTask);
 });
 
 app.delete('/api/projects/:id', validateId, (req, res) => {
@@ -214,14 +182,11 @@ app.delete('/api/projects/:id', validateId, (req, res) => {
 });
 
 app.delete('/api/tasks/:id', validateId, (req, res) => {
-    const taskId = req.params.id;
+    const taskId = Number(req.params.id);
 
-    const result = db.prepare(`
-        DELETE FROM tasks
-        WHERE id = ?
-    `).run(taskId);
+    const deleted = taskRepository.deleteTask(taskId);
 
-    if (result.changes === 0) {
+    if (!deleted) {
         return res.status(404).json({
             error: 'Task not found'
         });
