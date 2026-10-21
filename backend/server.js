@@ -8,10 +8,21 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 
+
 app.use(cors());
 app.use(express.json());
 
+function validateId(req, res, next){
+    const id = req.params.id;
+   
+    if(!/^[1-9]\d*$/.test(id)) {
+        return res.status(400).json({
+            error: 'ID must be a positive number'
+        })
+    }
 
+    next();
+}
 
 app.get('/', (req, res) => {
     res.send('BACKEND working');
@@ -23,7 +34,7 @@ app.get('/api/projects', (req, res) => {
     res.json(projects);
 });
 
-app.get('/api/projects/:id', (req, res) => {
+app.get('/api/projects/:id', validateId, (req, res) => {
     const project = db.prepare(`
         SELECT * FROM projects WHERE id = ?
     `).get(req.params.id);
@@ -37,7 +48,7 @@ app.get('/api/projects/:id', (req, res) => {
     res.json(project);
 });
 
-app.get('/api/projects/:id/tasks', (req, res) => {
+app.get('/api/projects/:id/tasks', validateId, (req, res) => {
     const projectId = req.params.id;
 
     const tasks = db.prepare(`
@@ -79,8 +90,16 @@ app.post('/api/projects', (req, res) => {
     res.status(201).json(project);
 });
 
-app.post('/api/projects/:id/tasks', (req, res) => {
+app.post('/api/projects/:id/tasks', validateId, (req, res) => {
     const projectId = req.params.id;
+    const project = db.prepare('SELECT id FROM projects WHERE id = ?').get(projectId);
+
+    if (!project) {
+        return res.status(404).json({
+            error: 'Project not found'
+        });
+    }
+
     const { title, description, status, priority, dueDate } = req.body;
 
     if (!title) {
@@ -119,7 +138,7 @@ app.post('/api/projects/:id/tasks', (req, res) => {
     res.status(201).json(task);
 });
 
-app.put('/api/projects/:id', (req, res) => {
+app.put('/api/projects/:id', validateId, (req, res) => {
     const { name, description } = req.body;
     const projectId = req.params.id;
 
@@ -154,7 +173,7 @@ app.put('/api/projects/:id', (req, res) => {
     res.json(project);
 });
 
-app.put('/api/tasks/:id', (req, res) => {
+app.put('/api/tasks/:id', validateId, (req, res) => {
     const taskId = req.params.id;
     const { title, description, status, priority, dueDate } = req.body;
 
@@ -195,7 +214,7 @@ app.put('/api/tasks/:id', (req, res) => {
     res.json(task);
 });
 
-app.delete('/api/projects/:id', (req, res) => {
+app.delete('/api/projects/:id', validateId, (req, res) => {
 
     const projectId = req.params.id;
 
@@ -214,7 +233,7 @@ app.delete('/api/projects/:id', (req, res) => {
     res.status(204).send();
 });
 
-app.delete('/api/tasks/:id', (req, res) => {
+app.delete('/api/tasks/:id', validateId, (req, res) => {
     const taskId = req.params.id;
 
     const result = db.prepare(`
